@@ -1,0 +1,1 @@
+go run main.go -debug=true -kubeconfig=/home/william86370/workspace/pwck8s/kubeconfig.yaml
