@@ -82,8 +82,15 @@ func handlePostProject(Config GlobalConfig, w http.ResponseWriter, r *http.Reque
 	}
 	client := Config.Client
 
+	//Get the User object from Rancher using the UserDN
+	user, err := rancher.GetRancherUser(client, UserDN)
+	if err != nil {
+		http.Error(w, Logboi(r, fmt.Sprintf("Error: %v", err)), http.StatusInternalServerError)
+		return
+	}
+
 	// Check if the user already has a project
-	err := rancher.EnsureNoDuplicateProject(client, UserDN, "local") //TODO Remove harrdcorded cluster IDs
+	err = rancher.EnsureNoDuplicateProject(client, UserDN, "local") //TODO Remove harrdcorded cluster IDs
 	if err != nil {
 		http.Error(w, Logboi(r, fmt.Sprintf("Error: %v", err)), http.StatusInternalServerError)
 		return
@@ -96,6 +103,14 @@ func handlePostProject(Config GlobalConfig, w http.ResponseWriter, r *http.Reque
 	err = rancher.CreateRancherProject(client, project)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create the ProjectRoleTemplateBinding in Rancher
+	err = rancher.CreateProjectRoleBinding(client, user.UserID, project, Config.DefaultProjectRole)
+	if err != nil {
+		log.Printf("Error creating ProjectRoleBinding: %v", err)
+		http.Error(w, "Error creating ProjectRoleBinding", http.StatusInternalServerError)
 		return
 	}
 

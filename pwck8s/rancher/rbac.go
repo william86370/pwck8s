@@ -98,3 +98,42 @@ func GetGlobalRoleBinding(client dynamic.Interface, OwnerDN string) (string, err
 	grb := userList.Items[0]
 	return grb.GetName(), nil
 }
+
+func CreateProjectRoleBinding(client dynamic.Interface, UserID string, project Project, projectRoleName string) error {
+	// Define the User CRD we want to create
+	prbGVR := schema.GroupVersionResource{
+		Group:    "management.cattle.io",
+		Version:  "v3",
+		Resource: "projectroletemplatebindings",
+	}
+
+	// Define the ProjectRoleBinding CRD we want to create
+	prb := &unstructured.Unstructured{
+		Object: map[string]interface{}{
+			"apiVersion": "management.cattle.io/v3",
+			"kind":       "ProjectRoleTemplateBinding",
+			"metadata": map[string]interface{}{
+				"name": "pwck8s-project-owner",
+				"labels": map[string]string{
+					"pwck8s/userid":         UserID,
+					"pwck8s/userdn":         project.OwnerDN,
+					"pwck8s/ownerdn":        project.OwnerDN,
+					"pwck8s/creationtime":   project.CreationTime.Format("2006-01-02T15-04-05Z07-00"),
+					"pwck8s/expirationtime": project.ExpirationTime.Format("2006-01-02T15-04-05Z07-00"),
+				},
+			},
+			"projectName":       project.ClusterID + ":" + project.ProjectID,
+			"roleTemplateName":  projectRoleName,
+			"userPrincipalName": "local://" + UserID,
+			"userName":          UserID,
+		},
+	}
+
+	// Create the PRB in Rancher
+	_, err := client.Resource(prbGVR).Namespace(project.ClusterID).Create(context.TODO(), prb, v1.CreateOptions{})
+	if err != nil {
+		return fmt.Errorf("failed to create ProjectRoleBinding: %v", err)
+	}
+	fmt.Printf("ProjectRoleBinding created: %s\n", UserID)
+	return nil
+}

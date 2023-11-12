@@ -311,6 +311,8 @@ func CreateRancherProject(client dynamic.Interface, newProject Project) error {
 		return fmt.Errorf("[CreateRancherProject] failed to create project: %v", err)
 	}
 
+	// TODO: Add a check to see if the project was created successfully
+
 	fmt.Printf("[CreateRancherProject] Project created: %s\n", newProject.ProjectID)
 	return nil
 }

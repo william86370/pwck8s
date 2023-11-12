@@ -112,12 +112,11 @@ func main() {
 
 	printInBox(infoLines)
 
-
 	GlobalConfig := api.GlobalConfig{
 		Client:             dynamicClient,
 		ClusterID:          "local", //TODO Remove hardcoded cluster ID
-		DefaultProjectRole: "project-owner",
-		DefaultGlobalRole:  "admin",
+		DefaultProjectRole: "project-member",
+		DefaultGlobalRole:  "user-base",
 		Debug:              *debug,
 	}
 
