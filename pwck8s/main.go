@@ -117,6 +117,10 @@ func main() {
 		api.ProjectHandler(dynamicClient, w, r)
 	})
 
+	http.HandleFunc("/api/v1/user", func(w http.ResponseWriter, r *http.Request) {
+		api.UserHandler(dynamicClient, w, r)
+	})
+
 	log.Println("Starting server on :8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }

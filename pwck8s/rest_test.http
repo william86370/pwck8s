@@ -1,5 +1,16 @@
 
 
+# REST request to test user creation
+POST http://localhost:8080/api/v1/user HTTP/1.1
+UserDN: wawrig2
+###
+GET http://localhost:8080/api/v1/user HTTP/1.1
+UserDN: wawrig2
+###
+DELETE http://localhost:8080/api/v1/user HTTP/1.1
+UserDN: wawrig2
+
+
 # REST request to test project creation
 POST http://localhost:8080/api/v1/project HTTP/1.1
 UserDN: wawrig2
@@ -9,3 +20,5 @@ UserDN: wawrig2
 ###
 DELETE http://localhost:8080/api/v1/project HTTP/1.1
 UserDN: wawrig2
+
+

@@ -7,20 +7,12 @@ import (
 	"os"
 	"time"
 
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 )
-
-// // Defines the structure for Rancher authentication
-// type RancherAuth struct {
-// 	URL           string `json:"url"`           //"https://your-rancher-server/v3/"
-// 	ApiKey        string `json:"apiKey"`        //"your-rancher-api-key"
-// 	DemoClusterID string `json:"demoClusterID"` //"your-rancher-demo-cluster-id"
-// }
 
 // DefaultResources creates a Resources struct with default Kubernetes-aligned values
 func DefaultResources() Resources {
@@ -314,7 +306,7 @@ func CreateRancherProject(client dynamic.Interface, newProject Project) error {
 	}
 
 	// Create the project in Rancher
-	_, err := client.Resource(projectGVR).Namespace(newProject.ClusterID).Create(context.TODO(), project, metav1.CreateOptions{})
+	_, err := client.Resource(projectGVR).Namespace(newProject.ClusterID).Create(context.TODO(), project, v1.CreateOptions{})
 	if err != nil {
 		return fmt.Errorf("[CreateRancherProject] failed to create project: %v", err)
 	}
