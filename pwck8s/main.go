@@ -112,13 +112,22 @@ func main() {
 
 	printInBox(infoLines)
 
+
+	GlobalConfig := api.GlobalConfig{
+		Client:             dynamicClient,
+		ClusterID:          "local", //TODO Remove hardcoded cluster ID
+		DefaultProjectRole: "project-owner",
+		DefaultGlobalRole:  "global-owner",
+		Debug:              *debug,
+	}
+
 	// Setup HTTP server and handlers
 	http.HandleFunc("/api/v1/project", func(w http.ResponseWriter, r *http.Request) {
-		api.ProjectHandler(dynamicClient, w, r)
+		api.ProjectHandler(GlobalConfig, w, r)
 	})
 
 	http.HandleFunc("/api/v1/user", func(w http.ResponseWriter, r *http.Request) {
-		api.UserHandler(dynamicClient, w, r)
+		api.UserHandler(GlobalConfig, w, r)
 	})
 
 	log.Println("Starting server on :8080")

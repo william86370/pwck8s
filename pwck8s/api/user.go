@@ -6,12 +6,10 @@ import (
 	"net/http"
 
 	rancher "pwck8s/rancher"
-
-	"k8s.io/client-go/dynamic"
 )
 
 // /api/v1/user
-func UserHandler(client dynamic.Interface, w http.ResponseWriter, r *http.Request) {
+func UserHandler(Config GlobalConfig, w http.ResponseWriter, r *http.Request) {
 
 	// Get the UserDN from the request
 	UserDN, err := GetUserDn(r)
@@ -21,18 +19,19 @@ func UserHandler(client dynamic.Interface, w http.ResponseWriter, r *http.Reques
 	}
 
 	if r.Method == "GET" {
-		handleGetUser(client, w, r, UserDN)
+		handleGetUser(Config, w, r, UserDN)
 	} else if r.Method == "POST" {
-		handlePostUser(client, w, r, UserDN)
+		handlePostUser(Config, w, r, UserDN)
 	} else if r.Method == "DELETE" {
-		HandleDeleteUser(client, w, r, UserDN)
+		HandleDeleteUser(Config, w, r, UserDN)
 	} else {
 		http.Error(w, Logboi(r, "Invalid request method"), http.StatusMethodNotAllowed)
 	}
 }
 
-func handleGetUser(client dynamic.Interface, w http.ResponseWriter, r *http.Request, UserDN string) {
+func handleGetUser(Config GlobalConfig, w http.ResponseWriter, r *http.Request, UserDN string) {
 
+	client := Config.Client
 	// Get the user from the UserDN
 	user, err := rancher.GetRancherUser(client, UserDN)
 	if err != nil {
@@ -49,7 +48,8 @@ func handleGetUser(client dynamic.Interface, w http.ResponseWriter, r *http.Requ
 	}
 }
 
-func handlePostUser(client dynamic.Interface, w http.ResponseWriter, r *http.Request, UserDN string) {
+func handlePostUser(Config GlobalConfig, w http.ResponseWriter, r *http.Request, UserDN string) {
+	client := Config.Client
 
 	// Check if the user already has a project
 	exists, err := rancher.UserExists(client, UserDN)
@@ -83,16 +83,16 @@ func handlePostUser(client dynamic.Interface, w http.ResponseWriter, r *http.Req
 
 }
 
+func HandleDeleteUser(Config GlobalConfig, w http.ResponseWriter, r *http.Request, UserDN string) {
+	client := Config.Client
 
-func HandleDeleteUser(client dynamic.Interface, w http.ResponseWriter, r *http.Request, UserDN string) {
-	
 	// Check if the user already has a user
 	exists, err := rancher.UserExists(client, UserDN)
 	if err != nil {
 		http.Error(w, Logboi(r, err.Error()), http.StatusInternalServerError)
 		return
 	}
-	
+
 	if !exists {
 		http.Error(w, Logboi(r, "User does not exist"), http.StatusNotFound)
 		return

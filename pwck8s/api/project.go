@@ -8,8 +8,6 @@ import (
 	"time"
 
 	rancher "pwck8s/rancher"
-
-	"k8s.io/client-go/dynamic"
 )
 
 func Logboi(r *http.Request, s string) string {
@@ -19,10 +17,10 @@ func Logboi(r *http.Request, s string) string {
 
 // GenerateProject Creates a new rancher project object with default values for UserDN
 // Takes UserDN (string)
-func GenerateProject(UserDN string) rancher.Project {
+func GenerateProject(UserDN string, ClusterID string) rancher.Project {
 	return rancher.Project{
 		ProjectID:      rancher.GenerateProjectId(),
-		ClusterID:      "local", //TODO - change to the cluster ID
+		ClusterID:      ClusterID, //TODO - change to the cluster ID
 		OwnerDN:        UserDN,
 		CreationTime:   time.Now(),
 		ExpirationTime: time.Now().Add(time.Hour), // 1 hour from now
@@ -32,28 +30,29 @@ func GenerateProject(UserDN string) rancher.Project {
 }
 
 // /api/v1/project
-func ProjectHandler(client dynamic.Interface, w http.ResponseWriter, r *http.Request) {
+func ProjectHandler(Config GlobalConfig, w http.ResponseWriter, r *http.Request) {
 
 	Logboi(r, fmt.Sprintf("Handling request from [%s]", r.RemoteAddr))
 
 	if r.Method == "GET" {
-		handleGetProject(client, w, r)
+		handleGetProject(Config, w, r)
 	} else if r.Method == "POST" {
-		handlePostProject(client, w, r)
+		handlePostProject(Config, w, r)
 	} else if r.Method == "DELETE" {
-		HandleDeleteProject(client, w, r)
+		HandleDeleteProject(Config, w, r)
 	} else {
 		http.Error(w, Logboi(r, "Invalid request method"), http.StatusMethodNotAllowed)
 	}
 }
 
-func HandleDeleteProject(client dynamic.Interface, w http.ResponseWriter, r *http.Request) {
+func HandleDeleteProject(Config GlobalConfig, w http.ResponseWriter, r *http.Request) {
 	// Get the UserDN from the request
 	UserDN := r.Header.Get("UserDN")
 	if UserDN == "" {
 		http.Error(w, Logboi(r, "UserDN not found"), http.StatusBadRequest)
 		return
 	}
+	client := Config.Client
 
 	// Get the project from the UserDN
 	project, err := rancher.GetProjectByOwner(client, UserDN, "local") //TODO Remove harrdcorded cluster IDs
@@ -73,7 +72,7 @@ func HandleDeleteProject(client dynamic.Interface, w http.ResponseWriter, r *htt
 	w.WriteHeader(http.StatusOK)
 }
 
-func handlePostProject(client dynamic.Interface, w http.ResponseWriter, r *http.Request) {
+func handlePostProject(Config GlobalConfig, w http.ResponseWriter, r *http.Request) {
 
 	// Get the UserDN from the request
 	UserDN := r.Header.Get("UserDN")
@@ -81,6 +80,7 @@ func handlePostProject(client dynamic.Interface, w http.ResponseWriter, r *http.
 		http.Error(w, Logboi(r, "UserDN not found"), http.StatusBadRequest)
 		return
 	}
+	client := Config.Client
 
 	// Check if the user already has a project
 	err := rancher.EnsureNoDuplicateProject(client, UserDN, "local") //TODO Remove harrdcorded cluster IDs
@@ -90,7 +90,7 @@ func handlePostProject(client dynamic.Interface, w http.ResponseWriter, r *http.
 	}
 
 	// Generate a new project object
-	project := GenerateProject(UserDN)
+	project := GenerateProject(UserDN, Config.ClusterID)
 
 	// Create the project in Rancher
 	err = rancher.CreateRancherProject(client, project)
@@ -111,7 +111,7 @@ func handlePostProject(client dynamic.Interface, w http.ResponseWriter, r *http.
 }
 
 // handleGetProjects handles GET requests to /api/v1/project
-func handleGetProject(client dynamic.Interface, w http.ResponseWriter, r *http.Request) {
+func handleGetProject(Config GlobalConfig, w http.ResponseWriter, r *http.Request) {
 
 	// Get the UserDN from the request
 	UserDN := r.Header.Get("UserDN")
@@ -119,6 +119,7 @@ func handleGetProject(client dynamic.Interface, w http.ResponseWriter, r *http.R
 		http.Error(w, Logboi(r, "UserDN not found"), http.StatusBadRequest)
 		return
 	}
+	client := Config.Client
 
 	// Get the project from the UserDN
 	project, err := rancher.GetProjectByOwner(client, UserDN, "local") //TODO Remove harrdcorded cluster IDs
