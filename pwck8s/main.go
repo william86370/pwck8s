@@ -117,7 +117,7 @@ func main() {
 		Client:             dynamicClient,
 		ClusterID:          "local", //TODO Remove hardcoded cluster ID
 		DefaultProjectRole: "project-owner",
-		DefaultGlobalRole:  "global-owner",
+		DefaultGlobalRole:  "admin",
 		Debug:              *debug,
 	}
 

@@ -48,6 +48,12 @@ func handleGetUser(Config GlobalConfig, w http.ResponseWriter, r *http.Request, 
 	}
 }
 
+func HandleCleanupUser(Config GlobalConfig, UserDN string) error {
+	//TODO Implement
+
+	return nil
+}
+
 func handlePostUser(Config GlobalConfig, w http.ResponseWriter, r *http.Request, UserDN string) {
 	client := Config.Client
 
@@ -68,6 +74,15 @@ func handlePostUser(Config GlobalConfig, w http.ResponseWriter, r *http.Request,
 	// Create the user in Rancher
 	err = rancher.CreateRancherUser(client, user)
 	if err != nil {
+		HandleCleanupUser(Config, UserDN)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create the GlobalRoleBinding in Rancher
+	err = rancher.CreateGlobalRoleBinding(client, user, Config.DefaultGlobalRole)
+	if err != nil {
+		HandleCleanupUser(Config, UserDN)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -100,6 +115,13 @@ func HandleDeleteUser(Config GlobalConfig, w http.ResponseWriter, r *http.Reques
 
 	// Delete the user in Rancher
 	err = rancher.DeleteRancherUser(client, UserDN)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Delete the GlobalRoleBinding in Rancher
+	err = rancher.DeleteGlobalRoleBinding(client, UserDN)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
