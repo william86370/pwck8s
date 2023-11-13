@@ -9,18 +9,21 @@ BINARY_NAME=pwck8s-backend
 DOCKER_IMAGE_NAME=pwck8s-backend
 DOCKER_TAG=latest
 
+.PHONY: download-dev
+download-dev:
+	@go mod download
+
 # Build the application for development
 .PHONY: build-dev
-build-dev:
+build-dev: download-dev
 	@echo "Building the application for development..."
-	go build -o ${BINARY_NAME}
+	@go build -o ${BINARY_NAME}
 
 # Run the application in development
 .PHONY: run-dev
-run-dev: build-dev
+run-dev: download-dev
 	@echo "Running the application..."
-	@PORT=8080 \
-	./${BINARY_NAME}
+	@go run main.go
 
 # Build the Docker image for production
 .PHONY: build-prod
