@@ -18,7 +18,8 @@ func GetUserDn(r *http.Request) (string, error) {
 	}
 
 	// Get the UserDN from the request
-	UserDN := r.Header.Get("X-Client-Dn")
+	// UserDN := r.Header.Get("X-Client-Dn")
+	UserDN := r.Header.Get("UserDN")
 	if UserDN == "" {
 		return "", fmt.Errorf("UserDN not found")
 	}

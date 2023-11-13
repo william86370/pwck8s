@@ -93,6 +93,8 @@ func GetConfigFromEnv() (api.GlobalConfig, error) {
 
 }
 
+// main function initializes a Kubernetes clientset and dynamic client, fetches Kubernetes version info,
+// gets the config from the environment, sets up HTTP server and handlers, and starts the server on port 8080.
 func main() {
 	var kubeconfig *string
 	debug := flag.Bool("debug", false, "Set to true to use kubeconfig for local debugging")

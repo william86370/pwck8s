@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: proxy-config
+data:
+  PORT: "8443"
+  TLS_CERT: "/pki/tls.crt"
+  TLS_KEY: "/pki/tls.key"
+  CA_CERT: "/pki/ca.crt"
+  PROXY_URL: "http://pwck8s-backend:8080"
+  DEBUG: "false"
+  HTTP_HEADER_CN: "X-Client-Cn"
+  HTTP_HEADER_DN: "X-Client-Dn"

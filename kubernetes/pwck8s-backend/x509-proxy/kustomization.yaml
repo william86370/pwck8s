@@ -1,0 +1,9 @@
+resources:
+  - deployment.yaml
+  - configmap.yaml
+  - pdb.yaml
+  - service.yaml
+  - vpa.yaml
+
+commonLabels:
+  pwck8s.io/managedby: kustomize

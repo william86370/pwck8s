@@ -1,0 +1,10 @@
+resources:
+  - deployment.yaml
+  - configmap.yaml
+  - pdb.yaml
+  - service.yaml
+  - vpa.yaml
+  - x509-proxy/
+
+commonLabels:
+  pwck8s.io/managedby: kustomize

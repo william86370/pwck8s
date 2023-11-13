@@ -23,7 +23,11 @@ build-dev: download-dev
 .PHONY: run-dev
 run-dev: download-dev
 	@echo "Running the application..."
-	@go run main.go
+	@CLUSTER_ID="local" \
+	AUTH_PROVIDER="local" \
+	DEFAULT_PROJECT_ROLE="project-member" \
+	DEFAULT_GLOBAL_ROLE="user-base" \
+	go run main.go -kubeconfig=${KUBECONFIG} -debug=true
 
 # Build the Docker image for production
 .PHONY: build-prod

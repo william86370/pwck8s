@@ -1,0 +1,5 @@
+namespace: pwck8s
+
+resources:
+  - namespace.yaml
+  

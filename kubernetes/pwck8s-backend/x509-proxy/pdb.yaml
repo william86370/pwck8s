@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: x509-proxy
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      pwck8s.io/app: x509-proxy
+      pwck8s.io/component: proxy

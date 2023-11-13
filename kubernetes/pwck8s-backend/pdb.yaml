@@ -1,0 +1,10 @@
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: pwck8s-backend
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      pwck8s.io/app: pwck8s-backend
+      pwck8s.io/component: backend

@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: x509-proxy
+  labels:
+    pwck8s.io/app: x509-proxy
+    pwck8s.io/component: proxy
+  annotations:
+    kubectl.kubernetes.io/default-container: proxy-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      pwck8s.io/app: x509-proxy
+      pwck8s.io/component: proxy
+  template:
+    metadata:
+      labels:
+        pwck8s.io/app: x509-proxy
+        pwck8s.io/component: proxy
+    spec:
+      containers:
+        - name: proxy-api
+          image: x509-proxy:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 8443
+              name: https
+          envFrom:
+            - configMapRef:
+                name: proxy-config
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+      securityContext:
+        fsGroup: 2000
+
+
+

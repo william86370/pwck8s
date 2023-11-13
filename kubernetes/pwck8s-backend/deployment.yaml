@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pwck8s-backend
+  labels:
+    pwck8s.io/app: pwck8s-backend
+    pwck8s.io/component: backend
+  annotations:
+    kubectl.kubernetes.io/default-container: backend-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      pwck8s.io/app: pwck8s-backend
+      pwck8s.io/component: backend
+  template:
+    metadata:
+      labels:
+        pwck8s.io/app: pwck8s-backend
+        pwck8s.io/component: backend
+    spec:
+      containers:
+        - name: backend-api
+          image: pwck8s-backend:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "500m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+          ports:
+            - containerPort: 8080
+              name: http
+          envFrom:
+            - configMapRef:
+                name: backend-config
+          readinessProbe:
+            httpGet:
+              path: /healthcheck
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            seccompProfile:
+              type: RuntimeDefault
+            capabilities:
+              drop:
+                - ALL
+      securityContext:
+        fsGroup: 2000
+
+
+
