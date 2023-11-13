@@ -8,8 +8,8 @@ KEY_FILE="client/client.key"
 
 # Exit if the client certificate and key already exist
 if [ -f "$CERT_FILE" ] && [ -f "$KEY_FILE" ]; then
-    echo "Error: Client certificate and key already exist."
-    exit 1
+    echo "Client certificate and key already exist."
+    exit 0
 fi
 
 # Create the /client directory if it doesn't exist
@@ -48,10 +48,10 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Display the client certificate information (DN)
-echo "Client Certificate DN:"
-openssl x509 -in "$CERT_FILE" -noout -subject
+# # Display the client certificate information (DN)
+# echo "Client Certificate DN:"
+# openssl x509 -in "$CERT_FILE" -noout -subject
 
-# Optionally, display the client certificate SAN (email)
-echo "Client Certificate SAN:"
-openssl x509 -in "$CERT_FILE" -noout -text | grep -A1 "Subject Alternative Name"
+# # Optionally, display the client certificate SAN (email)
+# echo "Client Certificate SAN:"
+# openssl x509 -in "$CERT_FILE" -noout -text | grep -A1 "Subject Alternative Name"

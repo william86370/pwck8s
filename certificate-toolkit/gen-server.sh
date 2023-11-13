@@ -8,8 +8,8 @@ KEY_FILE="server/server.key"
 
 # Exit if the server certificate and key already exist
 if [ -f "$CERT_FILE" ] && [ -f "$KEY_FILE" ]; then
-    echo "Error: Server certificate and key already exist."
-    exit 1
+    echo "Server certificate and key already exist."
+    exit 0
 fi
 
 # Create the /server directory if it doesn't exist
@@ -47,9 +47,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Display the server certificate information (DN and SAN)
-echo "Server Certificate DN:"
-openssl x509 -in "$CERT_FILE" -noout -subject
+# # Display the server certificate information (DN and SAN)
+# echo "Server Certificate DN:"
+# openssl x509 -in "$CERT_FILE" -noout -subject
 
-echo "Server Certificate SAN:"
-openssl x509 -in "$CERT_FILE" -noout -text | grep -A1 "Subject Alternative Name"
+# echo "Server Certificate SAN:"
+# openssl x509 -in "$CERT_FILE" -noout -text | grep -A1 "Subject Alternative Name"

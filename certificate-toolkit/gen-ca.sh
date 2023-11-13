@@ -2,8 +2,8 @@
 
 # check for an existing CA certificate and key
 if [ -f ca/ca.crt ] && [ -f ca/ca.key ]; then
-    echo "Error: CA certificate and key already exist"
-    exit 1
+    echo "CA certificate and key already exist"
+    exit 0
 fi
 
 # Create the /ca folder if it doesn't exist
@@ -28,6 +28,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Display the CA certificate information DN 
-echo "CA Certificate DN:" 
-openssl x509 -in ca/ca.crt -noout -subject
+# # Display the CA certificate information DN 
+# echo "CA Certificate DN:" 
+# openssl x509 -in ca/ca.crt -noout -subject
