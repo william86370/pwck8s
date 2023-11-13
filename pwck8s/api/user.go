@@ -69,7 +69,7 @@ func handlePostUser(Config GlobalConfig, w http.ResponseWriter, r *http.Request,
 	}
 
 	// Generate a new user object
-	user := rancher.GenerateUser(UserDN)
+	user := rancher.GenerateUser(UserDN, Config.AuthProvider)
 
 	// Create the user in Rancher
 	err = rancher.CreateRancherUser(client, user)

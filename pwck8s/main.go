@@ -1,9 +1,11 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -52,6 +54,43 @@ func prettyLogBox(title string, content map[string]string) string {
 		contentLines += fmt.Sprintf("| %s: %s%s |\n", key, value, strings.Repeat(" ", maxLength-len(key+": "+value)))
 	}
 	return fmt.Sprintf("%s\n%s\n%s%s", topBottomBorder, titleLine, contentLines, topBottomBorder)
+}
+
+func GetConfigFromEnv() (api.GlobalConfig, error) {
+	Config := api.GlobalConfig{}
+	// Get the config from the environment
+
+	// Get the cluster ID
+	ClusterID := os.Getenv("CLUSTER_ID")
+	if ClusterID == "" {
+		return Config, errors.New("CLUSTER_ID not set")
+	}
+
+	// Get the auth provider
+	AuthProvider := os.Getenv("AUTH_PROVIDER")
+	if AuthProvider == "" {
+		return Config, errors.New("AUTH_PROVIDER not set")
+	}
+
+	// Get the default project role
+	DefaultProjectRole := os.Getenv("DEFAULT_PROJECT_ROLE")
+	if DefaultProjectRole == "" {
+		return Config, errors.New("DEFAULT_PROJECT_ROLE not set")
+	}
+
+	// Get the default global role
+	DefaultGlobalRole := os.Getenv("DEFAULT_GLOBAL_ROLE")
+	if DefaultGlobalRole == "" {
+		return Config, errors.New("DEFAULT_GLOBAL_ROLE not set")
+	}
+
+	Config.ClusterID = ClusterID
+	Config.AuthProvider = AuthProvider
+	Config.DefaultProjectRole = DefaultProjectRole
+	Config.DefaultGlobalRole = DefaultGlobalRole
+
+	return Config, nil
+
 }
 
 func main() {
@@ -112,13 +151,15 @@ func main() {
 
 	printInBox(infoLines)
 
-	GlobalConfig := api.GlobalConfig{
-		Client:             dynamicClient,
-		ClusterID:          "local", //TODO Remove hardcoded cluster ID
-		DefaultProjectRole: "project-member",
-		DefaultGlobalRole:  "user-base",
-		Debug:              *debug,
+	// Get the config from the environment
+	GlobalConfig, err := GetConfigFromEnv()
+	if err != nil {
+		color.Red("Error getting config from environment: %v", err)
+		return
 	}
+
+	GlobalConfig.Client = dynamicClient
+	GlobalConfig.Debug = *debug
 
 	// Setup HTTP server and handlers
 	http.HandleFunc("/api/v1/project", func(w http.ResponseWriter, r *http.Request) {

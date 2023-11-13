@@ -37,13 +37,13 @@ func GenerateUserId() string {
 	return "pwck8s-" + string(b)
 }
 
-func GenerateUser(UserDN string) User {
+func GenerateUser(UserDN string, AuthProvider string) User {
 	// Generate a new user object
 	UserID := GenerateUserId()
 	user := User{
 		UserID:         UserID,
 		DisplayName:    UserID,
-		PrincipalIds:   []string{"local://" + UserID},
+		PrincipalIds:   []string{AuthProvider + "://" + UserID},
 		UserDN:         UserDN,
 		CreationTime:   time.Now(),
 		ExpirationTime: time.Now().AddDate(0, 0, 1),
