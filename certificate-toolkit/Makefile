@@ -1,6 +1,6 @@
 .PHONY: all clean
 
-all: ca-cert client-cert
+all: ca-cert client-cert server-cert
 
 ca-cert:
 	./gen-ca.sh
@@ -8,6 +8,10 @@ ca-cert:
 client-cert:
 	./gen-client.sh
 
+server-cert:
+	./gen-server.sh
+
 clean:
 	rm -rf ca
 	rm -rf client
+	rm -rf server
