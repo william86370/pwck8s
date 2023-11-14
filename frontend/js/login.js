@@ -3,19 +3,31 @@
 
 const SERVER_URL = 'http://ip-10-113-60-162:8080';
 
+const RANCHER_URL = 'https://ip-10-113-61-179/dashboard/home';
+
+
 document.addEventListener('DOMContentLoaded', (event) => {
   checkUserExists();
 });
 
+function openLink() {
+  window.open(RANCHER_URL, '_blank'); // '_blank' is used to open the link in a new tab
+}
+
 function startTimer(expirationTime){
     // User exists, hide login button and show delete button
     document.getElementById('loginButton').style.display = 'none';
-    document.getElementById('deleteProject').style.display = 'block';
-    document.getElementById('deleteProject').onclick = deleteUser; // Attach event handler
+    document.getElementById('closeSession').style.display = 'block';
+    document.getElementById('closeSession').onclick = deleteUser; // Attach event handler
     // Set up the countdown timer
     startCountdown(expirationTime);
 }
-
+function logoutreset() {
+  const countdownTimer = document.getElementById('countdownTimer');
+  countdownTimer.style.display = 'none'; 
+  document.getElementById('loginButton').style.display = 'block';
+  document.getElementById('closeSession').style.display = 'none';
+}
 
 function checkUserExists() {
   fetch(SERVER_URL+'/api/v1/user',{
@@ -38,6 +50,7 @@ function checkUserExists() {
     .then(data => {
       if (data && data.userId !== "") {
         startTimer(data.expirationTime)
+        bindLink(data.clusterId);
       }
     })
     .catch(error => {
@@ -130,55 +143,133 @@ function startCountdown(expirationTime) {
 }
 
 function deleteUser() {
-  fetch(SERVER_URL+'/api/v1/user',{
+  // Display the provisioning popup with the loading animation
+  showProvisioningPopup('Deleting...'); // You can pass a custom message if you want
+
+  fetch(SERVER_URL+'/api/v1/user', {
     method: 'DELETE',
     headers: {
       'UserDN': 'wawrig2'
-      },
+    },
   })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Error deleting user');
-      }
-      return response.json();
-    })
-    .then(data => {
-      console.log('User deleted:', data);
-      // Handle successful deletion, maybe redirect to a login page
-    })
-    .catch(error => {
-      console.error('Error during deletion:', error);
-      // Handle deletion error
-    });
+  .then(response => {
+    if (response.ok) {
+      // Wait for 5 seconds, then remove the provisioning popup and reset the UI
+      setTimeout(() => {
+        logoutreset();
+        // Optionally, you can also reload the page here or redirect the user
+      }, 5000);
+    } else {
+      throw new Error('Failed to delete user');
+    }
+  })
+  .catch(error => {
+    console.error('Error during deletion:', error);
+    // Handle deletion error
+  });
 }
 
 // Add event listener to login button
-document.getElementById('loginButton').addEventListener('click', sendLoginRequest);
+document.getElementById('loginButton').addEventListener('click', doLogin);
+
+
+
+function doLogin(){
+  // Display the provisioning popup
+  showProvisioningPopup();
+  sendLoginRequest()
+  sendProjectRequest()
+}
+
+function sendProjectRequest(){
+// Send the POST request
+fetch(SERVER_URL + '/api/v1/project', {
+  method: 'POST',
+  headers: {
+    'UserDN': 'wawrig2'
+  },
+})
+.then(response => {
+  if (response.status === 201) {
+    return response.json();
+  } else {
+    throw new Error('Project was not successful');
+  }
+})
+.catch(error => {
+  console.error('There was an error creating project', error);
+});
+}
 
 function sendLoginRequest() {
-    // Send the POST request
-    fetch(SERVER_URL+'/api/v1/user', {
-      method: 'POST',
-      headers: {
-        'UserDN': 'wawrig2'
-        },
-    })
-    .then(response => {
-      if (response.status === 201) {
-
-        return response.json();
-      } else {
-        throw new Error('Login was not successful');
+  // Send the POST request
+  fetch(SERVER_URL + '/api/v1/user', {
+    method: 'POST',
+    headers: {
+      'UserDN': 'wawrig2'
+    },
+  })
+  .then(response => {
+    if (response.status === 201) {
+      return response.json();
+    } else {
+      throw new Error('Login was not successful');
+    }
+  })
+  .then(data => {
+    // Check if the user/project exists after 5 seconds
+    setTimeout(() => {
+      if (data && data.userId !== "") {
+        startTimer(data.expirationTime);
+        // bindLink(data.clusterId);
       }
-    })
-    .then(data => {
-              // Login was successful, now check if the user/project exists
-              if (data && data.userId !== "") {
-                startTimer(data.expirationTime)
-              }
-    })
-    .catch(error => {
-      console.error('There was an error logging in:', error);
-      // Handle login errors, possibly display a message to the user
-    });
-  }
+    }, 5000);
+  })
+  .catch(error => {
+    console.error('There was an error logging in:', error);
+    // Handle login errors, possibly display a message to the user
+  });
+}
+
+
+ function showProvisioningPopup(message) {
+  // Create backdrop
+  let backdrop = document.createElement('div');
+  backdrop.setAttribute('id', 'provisioningBackdrop');
+  backdrop.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10002;`;
+
+  // Create loading circle div
+  let loadingCircle = document.createElement('div');
+  loadingCircle.setAttribute('class', 'loading-circle');
+
+  // Create provisioning text
+  let provisioningText = document.createElement('p');
+  provisioningText.textContent = message || 'Provisioning...'; // Default message is 'Provisioning...'
+  provisioningText.style.color = 'white';
+  provisioningText.style.textAlign = 'center';
+  provisioningText.style.marginTop = '10px';
+  provisioningText.style.marginLeft = '10px';
+
+  // Append loading circle and text to backdrop
+  backdrop.appendChild(loadingCircle);
+  backdrop.appendChild(provisioningText);
+
+  // Add backdrop to body
+  document.body.appendChild(backdrop);
+
+  // Remove the provisioning popup after 5 seconds
+  setTimeout(() => {
+    document.body.removeChild(backdrop);
+  }, 5000);
+}

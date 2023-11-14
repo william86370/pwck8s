@@ -53,6 +53,27 @@ button:hover {
   background-color: #0056b3; /* Darker shade for hover effect */
 }
 
+#loginButton {
+  background-color: #007bff; /* Bootstrap primary color for example */
+  color: white;
+  border: none;
+  padding: 15px 30px; /* Match the padding of the 'Close Session' button */
+  font-size: 18px; /* Match the font size of the 'Close Session' button */
+  border-radius: 5px;
+  cursor: pointer;
+  display: block; /* Make the button a block to fill the container */
+  width: 80%; /* Match the width of the 'Close Session' button */
+  margin: 10px auto; /* Center the button */
+  text-transform: uppercase; /* Uppercase button text */
+  transition: all 0.3s ease; /* Smooth transition for all changes */
+}
+
+#loginButton:hover {
+  background-color: #0056b3; /* Darker shade for hover effect */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect for consistency */
+  transform: translateY(-2px); /* Slight lift for consistency */
+}
+
 .site-banner {
   background-color: rgb(187, 25, 168); /* Color for classification */
   color: white;
@@ -65,17 +86,11 @@ button:hover {
   z-index: 1000; /* Ensure it stays on top */
 }
 
-/* #countdownTimer {
-  font-size: 20px;
-  margin-top: 20px;
-} */
-
-
 /* Timer Styles */
 #countdownTimer {
   color: #00bcd4; /* Font color */
   background-color: #333; /* Background color */
-  font-size: 48px; /* Large font size */
+  font-size: 36px; /* Large font size */
   text-align: center; /* Center the text */
   padding: 20px;
   border: 5px solid red; /* Red border around the timer */
@@ -85,9 +100,8 @@ button:hover {
   margin: 20px auto; /* Center the timer */
 }
 
-
 /* Button Styles */
-#deleteButton {
+#closeSession {
   background-color: #ff5722; /* Change the color to match the image */
   color: white;
   border: none;
@@ -97,8 +111,36 @@ button:hover {
   cursor: pointer;
   display: block; /* Make the button a block to fill the container */
   width: 80%; /* Adjust width as needed */
-  margin: 10px auto; /* Center the button */
+  margin: 0 auto; /* Center the button */
   text-transform: uppercase; /* Uppercase button text */
+  transition: all 0.3s ease; /* Smooth transition for all changes */
+}
+
+#closeSession:hover {
+  background-color: #e64a19; /* Darker shade on hover */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Shadow effect */
+  transform: translateY(-2px); /* Slight lift */
+}
+
+/* Add this if you want to animate the button back to its original state when not hovered */
+#closeSession:not(:hover) {
+  box-shadow: none;
+  transform: translateY(0);
+}
+
+/* Loading Circle Animation */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-circle {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 3s linear infinite;
 }
 
 </style>
@@ -113,7 +155,8 @@ button:hover {
       <p>A simple, interactive and fun playground to learn CK8S</p>
       <div id="userActions">
         <button id="loginButton" type="button">Login</button> <!-- This will be hidden if the user exists -->
-        <button id="deleteProject" style="display:none;" type="button">Close Session</button> <!-- Hidden by default -->
+        <button id="closeSession" style="display:none;" type="button">Close Session</button> <!-- Hidden by default -->
+        <button id="openLinkButton"  onclick="openLink()" type="button">Open External Site</button>
       </div>
       <!-- Add countdown box -->
       <div id="countdownTimer" style="display:none;">00:00:00</div> <!-- Hidden by default -->
