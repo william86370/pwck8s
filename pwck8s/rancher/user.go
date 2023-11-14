@@ -133,9 +133,9 @@ func GetRancherUser(client dynamic.Interface, OwnerDN string) (User, error) {
 	if len(userList.Items) > 1 {
 		return tmpuser, fmt.Errorf("multiple users found")
 	}
-	// If there are no users with the same OwnerDN, return an error
+	// If there are no users with the same OwnerDN,
 	if len(userList.Items) == 0 {
-		return tmpuser, fmt.Errorf("no users found")
+		return tmpuser, nil
 	}
 	user := userList.Items[0]
 

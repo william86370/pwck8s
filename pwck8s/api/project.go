@@ -34,6 +34,17 @@ func ProjectHandler(Config GlobalConfig, w http.ResponseWriter, r *http.Request)
 
 	Logboi(r, fmt.Sprintf("Handling request from [%s]", r.RemoteAddr))
 
+	(w).Header().Set("Access-Control-Allow-Origin", "*")
+	(w).Header().Set("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS")
+	(w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, UserDN")
+
+	// Check if the request is for CORS preflight
+	if r.Method == "OPTIONS" {
+		// Just return header with no body, as preflight is just to check the CORS setting of the server
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	if r.Method == "GET" {
 		handleGetProject(Config, w, r)
 	} else if r.Method == "POST" {

@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Play with CK8S</title>
 <style>
-  /* CSS goes here */
+
+  * {
+  box-sizing: border-box;
+}
 
 /* Global Styles */
 body, html {
@@ -15,6 +18,8 @@ body, html {
 }
 
 body {
+  padding-top: 50px; /* Height of the classification banner */
+  margin: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -24,6 +29,8 @@ body {
 /* Content Box Styles */
 .content-box {
   width: 70%;
+  max-height: calc(100vh - 50px);
+  overflow-y: auto; 
   max-width: 400px;
   background-color: #ffffff;
   border-radius: 10px;
@@ -46,14 +53,74 @@ button:hover {
   background-color: #0056b3; /* Darker shade for hover effect */
 }
 
+.site-banner {
+  background-color: rgb(187, 25, 168); /* Color for classification */
+  color: white;
+  text-align: center;
+  width: 100%;
+  padding: 0.5rem 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Ensure it stays on top */
+}
+
+/* #countdownTimer {
+  font-size: 20px;
+  margin-top: 20px;
+} */
+
+
+/* Timer Styles */
+#countdownTimer {
+  color: #00bcd4; /* Font color */
+  background-color: #333; /* Background color */
+  font-size: 48px; /* Large font size */
+  text-align: center; /* Center the text */
+  padding: 20px;
+  border: 5px solid red; /* Red border around the timer */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for some depth */
+  width: 80%; /* Adjust width as needed */
+  margin: 20px auto; /* Center the timer */
+}
+
+
+/* Button Styles */
+#deleteButton {
+  background-color: #ff5722; /* Change the color to match the image */
+  color: white;
+  border: none;
+  padding: 15px 30px;
+  font-size: 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: block; /* Make the button a block to fill the container */
+  width: 80%; /* Adjust width as needed */
+  margin: 10px auto; /* Center the button */
+  text-transform: uppercase; /* Uppercase button text */
+}
+
 </style>
 </head>
 <body>
+  <div class="site-banner">
+    TEST BANNER
+  </div>
     <div class="content-box">
       <img src="src/Logo.png" alt="CK8S Logo" style="width: 150px; height: auto;"/>
       <h1>Play with CK8S</h1>
       <p>A simple, interactive and fun playground to learn CK8S</p>
-      <button type="button" onclick="location.href='your-login-url'">Login</button>
+      <div id="userActions">
+        <button id="loginButton" type="button">Login</button> <!-- This will be hidden if the user exists -->
+        <button id="deleteProject" style="display:none;" type="button">Close Session</button> <!-- Hidden by default -->
+      </div>
+      <!-- Add countdown box -->
+      <div id="countdownTimer" style="display:none;">00:00:00</div> <!-- Hidden by default -->
+
     </div>
   </body>
+
+<!-- Login Modal -->
+<script src="js/login.js"></script>
 </html>

@@ -11,6 +11,17 @@ import (
 // /api/v1/user
 func UserHandler(Config GlobalConfig, w http.ResponseWriter, r *http.Request) {
 
+	(w).Header().Set("Access-Control-Allow-Origin", "*")
+	(w).Header().Set("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS")
+	(w).Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, UserDN")
+
+	// Check if the request is for CORS preflight
+	if r.Method == "OPTIONS" {
+		// Just return header with no body, as preflight is just to check the CORS setting of the server
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+
 	// Get the UserDN from the request
 	UserDN, err := GetUserDn(r)
 	if err != nil {
@@ -38,7 +49,8 @@ func handleGetUser(Config GlobalConfig, w http.ResponseWriter, r *http.Request, 
 		http.Error(w, Logboi(r, err.Error()), http.StatusInternalServerError)
 		return
 	}
-	//Set http code to deleted
+	// Log
+	Logboi(r, "["+UserDN+"]")
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(user); err != nil {
