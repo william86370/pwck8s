@@ -20,7 +20,7 @@ func Logboi(r *http.Request, s string) string {
 func GenerateProject(UserDN string, ClusterID string) rancher.Project {
 	return rancher.Project{
 		ProjectID:      rancher.GenerateProjectId(),
-		ClusterID:      ClusterID, //TODO - change to the cluster ID
+		ClusterID:      ClusterID,
 		OwnerDN:        UserDN,
 		CreationTime:   time.Now(),
 		ExpirationTime: time.Now().Add(time.Hour), // 1 hour from now
